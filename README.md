@@ -34,7 +34,8 @@ plugins/tsm-exchange-rate-hub/
 │   ├── class-…-api.php                # External API integration
 │   ├── class-…-cache.php              # Transient-based caching
 │   ├── class-…-cron.php               # WP-Cron scheduling
-│   └── class-…-rest.php               # REST API endpoints (bonus)
+│   ├── class-…-rest.php               # REST API endpoints 
+│   └── class-…-cli.php                # WP-CLI commands 
 │
 ├── admin/                             # Back-office UI
 │   ├── class-…-admin.php              # Menu pages, Settings API, AJAX
@@ -62,7 +63,8 @@ The plugin follows the **WordPress Plugin Boilerplate** (WPPB) pattern with clea
 | **Cron** | WP-Cron for periodic automatic updates |
 | **Admin** | Settings page + dashboard (Settings API, AJAX, nonces) |
 | **Public** | `[tsm_exchange_rates]` shortcode + page template |
-| **REST** | `/wp-json/tsm-exchange-rate-hub/v1/rates` (bonus) |
+| **REST** | `/wp-json/tsm-exchange-rate-hub/v1/rates`  |
+| **CLI** | `wp tsm-erh` commands for terminal management  |
 
 ---
 
@@ -174,13 +176,45 @@ Request → Transient Cache (hit?) → YES → return cached data
 ### Page Template
 Select **Exchange Rates** from the Page Attributes → Template dropdown to create a dedicated exchange rates page that inherits the active theme's header, footer, and styles.
 
-### REST API
+### REST API 
 
 | Method | Endpoint | Auth | Description |
 |--------|----------|------|-------------|
 | `GET` | `/wp-json/tsm-exchange-rate-hub/v1/rates` | Public | Latest rates (optional `?base=USD`) |
 | `GET` | `/wp-json/tsm-exchange-rate-hub/v1/rates/{BASE}` | Public | Rates for specific base |
 | `POST` | `/wp-json/tsm-exchange-rate-hub/v1/refresh` | Admin | Force refresh from API |
+
+### WP-CLI Commands 
+
+All commands are registered under the `tsm-erh` namespace.
+
+```bash
+# Show current exchange rates
+wp tsm-erh rates
+wp tsm-erh rates --base=USD --format=json
+
+# Force refresh from API
+wp tsm-erh refresh
+wp tsm-erh refresh --base=USD
+
+# Plugin status overview
+wp tsm-erh status
+
+# Clear transient cache
+wp tsm-erh cache clear
+
+# View historical rates for a currency pair
+wp tsm-erh history EUR USD
+wp tsm-erh history EUR GBP --limit=50 --format=csv
+```
+
+| Command | Description |
+|---------|-------------|
+| `wp tsm-erh rates` | Display latest rates (supports `--base`, `--format`) |
+| `wp tsm-erh refresh` | Fetch & store fresh rates from API |
+| `wp tsm-erh status` | Show base currency, last update, next cron, cache status |
+| `wp tsm-erh cache clear` | Purge all plugin transients |
+| `wp tsm-erh history <base> <target>` | Show historical rate records (supports `--limit`, `--format`) |
 
 ---
 

@@ -35,6 +35,7 @@ class Tsm_Exchange_Rate_Hub {
 		$this->define_admin_hooks();
 		$this->define_public_hooks();
 		$this->define_rest_hooks();
+		$this->define_cli_commands();
 	}
 
 	/**
@@ -72,6 +73,7 @@ class Tsm_Exchange_Rate_Hub {
 		require_once $path . 'includes/class-tsm-exchange-rate-hub-cache.php';
 		require_once $path . 'includes/class-tsm-exchange-rate-hub-cron.php';
 		require_once $path . 'includes/class-tsm-exchange-rate-hub-rest.php';
+		require_once $path . 'includes/class-tsm-exchange-rate-hub-cli.php';
 		require_once $path . 'admin/class-tsm-exchange-rate-hub-admin.php';
 		require_once $path . 'public/class-tsm-exchange-rate-hub-public.php';
 
@@ -156,6 +158,12 @@ class Tsm_Exchange_Rate_Hub {
 	private function define_rest_hooks() {
 		$rest = new Tsm_Exchange_Rate_Hub_REST();
 		$this->loader->add_action( 'rest_api_init', $rest, 'register_routes' );
+	}
+
+	private function define_cli_commands() {
+		if ( defined( 'WP_CLI' ) && WP_CLI ) {
+			WP_CLI::add_command( 'tsm-erh', 'Tsm_Exchange_Rate_Hub_CLI' );
+		}
 	}
 
 	public function run() {
